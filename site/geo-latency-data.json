@@ -1,0 +1,1289 @@
+{
+  "generated_at_epoch": 1783332045,
+  "generated_at_utc": "2026-07-06 10:00 UTC",
+  "epoch": 854,
+  "vantage": "Japan testnet full-node (Tokyo)",
+  "vantage_point": {
+    "lat": 35.6762,
+    "lon": 139.6503,
+    "label": "ProofLine node \u00b7 Tokyo"
+  },
+  "rtt_method": "ICMP echo, 5 packets/host, averaged over all rounds this epoch, stake-weighted median",
+  "coverage": {
+    "total_validators": 200,
+    "geo_located": 198,
+    "rtt_reachable_ips": 177,
+    "rtt_total_ips": 197,
+    "rtt_rounds": 6
+  },
+  "headline": {
+    "top4_provider_stake_pct": 50.77,
+    "top2_provider_stake_pct": 36.05,
+    "bft_threshold_pct": 33.3
+  },
+  "continents": [
+    {
+      "name": "EU",
+      "stake_pct": 56.11,
+      "count": 114,
+      "count_pct": 57.6,
+      "rtt_ms": 259
+    },
+    {
+      "name": "NA",
+      "stake_pct": 26.47,
+      "count": 51,
+      "count_pct": 25.8,
+      "rtt_ms": 150
+    },
+    {
+      "name": "APAC",
+      "stake_pct": 15.07,
+      "count": 28,
+      "count_pct": 14.1,
+      "rtt_ms": 67
+    },
+    {
+      "name": "Other",
+      "stake_pct": 2.35,
+      "count": 5,
+      "count_pct": 2.5,
+      "rtt_ms": 150
+    }
+  ],
+  "countries": [
+    {
+      "name": "United States",
+      "cc": "US",
+      "stake_pct": 23.18,
+      "count": 44,
+      "rtt_ms": 141,
+      "top_provider": "TeraSwitch Networks Inc.",
+      "top_provider_pct": 24.3,
+      "provider_count": 15
+    },
+    {
+      "name": "Germany",
+      "cc": "DE",
+      "stake_pct": 16.14,
+      "count": 33,
+      "rtt_ms": 259,
+      "top_provider": "Hetzner Online GmbH",
+      "top_provider_pct": 46.6,
+      "provider_count": 13
+    },
+    {
+      "name": "Finland",
+      "cc": "FI",
+      "stake_pct": 11.28,
+      "count": 24,
+      "rtt_ms": 272,
+      "top_provider": "Hetzner Online GmbH",
+      "top_provider_pct": 100.0,
+      "provider_count": 1
+    },
+    {
+      "name": "Singapore",
+      "cc": "SG",
+      "stake_pct": 6.44,
+      "count": 11,
+      "rtt_ms": 65,
+      "top_provider": "TeraSwitch Networks Inc.",
+      "top_provider_pct": 46.3,
+      "provider_count": 3
+    },
+    {
+      "name": "The Netherlands",
+      "cc": "NL",
+      "stake_pct": 5.64,
+      "count": 12,
+      "rtt_ms": 228,
+      "top_provider": "Servers.com, Inc.",
+      "top_provider_pct": 33.3,
+      "provider_count": 6
+    },
+    {
+      "name": "Poland",
+      "cc": "PL",
+      "stake_pct": 5.64,
+      "count": 12,
+      "rtt_ms": 229,
+      "top_provider": "MEVSPACE sp. z o.o.",
+      "top_provider_pct": 91.7,
+      "provider_count": 2
+    },
+    {
+      "name": "Sweden",
+      "cc": "SE",
+      "stake_pct": 4.87,
+      "count": 9,
+      "rtt_ms": 265,
+      "top_provider": "UAB Cherry Servers",
+      "top_provider_pct": 100.0,
+      "provider_count": 1
+    },
+    {
+      "name": "France",
+      "cc": "FR",
+      "stake_pct": 4.87,
+      "count": 9,
+      "rtt_ms": 247,
+      "top_provider": "OVH SAS",
+      "top_provider_pct": 100.0,
+      "provider_count": 1
+    },
+    {
+      "name": "Australia",
+      "cc": "AU",
+      "stake_pct": 3.76,
+      "count": 8,
+      "rtt_ms": 113,
+      "top_provider": "OVH SAS",
+      "top_provider_pct": 100.0,
+      "provider_count": 1
+    },
+    {
+      "name": "Canada",
+      "cc": "CA",
+      "stake_pct": 3.29,
+      "count": 7,
+      "rtt_ms": 167,
+      "top_provider": "OVH SAS",
+      "top_provider_pct": 100.0,
+      "provider_count": 1
+    },
+    {
+      "name": "Austria",
+      "cc": "AT",
+      "stake_pct": 3.29,
+      "count": 7,
+      "rtt_ms": 244,
+      "top_provider": "Nessus GmbH",
+      "top_provider_pct": 71.4,
+      "provider_count": 3
+    },
+    {
+      "name": "Japan",
+      "cc": "JP",
+      "stake_pct": 2.99,
+      "count": 5,
+      "rtt_ms": 0,
+      "top_provider": "Limestone Networks, Inc.",
+      "top_provider_pct": 52.8,
+      "provider_count": 4
+    }
+  ],
+  "providers": [
+    {
+      "name": "Hetzner Online GmbH",
+      "asn": "AS24940",
+      "stake_pct": 18.8,
+      "cum_pct": 18.8,
+      "count": 40,
+      "rtt_ms": 271
+    },
+    {
+      "name": "OVH SAS",
+      "asn": "AS16276",
+      "stake_pct": 17.25,
+      "cum_pct": 36.05,
+      "count": 34,
+      "rtt_ms": 241
+    },
+    {
+      "name": "TeraSwitch Networks Inc.",
+      "asn": "AS20326",
+      "stake_pct": 9.55,
+      "cum_pct": 45.6,
+      "count": 15,
+      "rtt_ms": 132
+    },
+    {
+      "name": "MEVSPACE sp. z o.o.",
+      "asn": "AS201814",
+      "stake_pct": 5.17,
+      "cum_pct": 50.77,
+      "count": 11,
+      "rtt_ms": 228
+    },
+    {
+      "name": "UAB Cherry Servers",
+      "asn": "AS214159",
+      "stake_pct": 4.87,
+      "cum_pct": 55.64,
+      "count": 9,
+      "rtt_ms": 265
+    },
+    {
+      "name": "Limestone Networks, Inc.",
+      "asn": "AS46475",
+      "stake_pct": 4.26,
+      "cum_pct": 59.9,
+      "count": 5,
+      "rtt_ms": 150
+    },
+    {
+      "name": "Latitude.sh",
+      "asn": "AS396356",
+      "stake_pct": 3.76,
+      "cum_pct": 63.66,
+      "count": 8,
+      "rtt_ms": 163
+    },
+    {
+      "name": "Interserver, Inc",
+      "asn": "AS19318",
+      "stake_pct": 3.29,
+      "cum_pct": 66.95,
+      "count": 7,
+      "rtt_ms": 168
+    },
+    {
+      "name": "Servers.com, Inc.",
+      "asn": "AS7979",
+      "stake_pct": 2.35,
+      "cum_pct": 69.3,
+      "count": 5,
+      "rtt_ms": 245
+    },
+    {
+      "name": "Nessus GmbH",
+      "asn": "AS47692",
+      "stake_pct": 2.35,
+      "cum_pct": 71.65,
+      "count": 5,
+      "rtt_ms": 244
+    },
+    {
+      "name": "velia.net",
+      "asn": "AS30083",
+      "stake_pct": 1.88,
+      "cum_pct": 73.53,
+      "count": 4,
+      "rtt_ms": 162
+    },
+    {
+      "name": "FiberState, LLC",
+      "asn": "AS26042",
+      "stake_pct": 1.88,
+      "cum_pct": 75.41,
+      "count": 4,
+      "rtt_ms": 102
+    }
+  ],
+  "map_points": [
+    {
+      "city": "Helsinki",
+      "country": "Finland",
+      "cc": "FI",
+      "lat": 60.1719,
+      "lon": 24.9347,
+      "count": 24,
+      "stake_pct": 11.28,
+      "rtt_ms": 272,
+      "providers": [
+        {
+          "name": "Hetzner Online GmbH",
+          "count": 24,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Falkenstein",
+      "country": "Germany",
+      "cc": "DE",
+      "lat": 50.4777,
+      "lon": 12.3649,
+      "count": 14,
+      "stake_pct": 6.58,
+      "rtt_ms": 270,
+      "providers": [
+        {
+          "name": "Hetzner Online GmbH",
+          "count": 14,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Singapore",
+      "country": "Singapore",
+      "cc": "SG",
+      "lat": 1.2799,
+      "lon": 103.849,
+      "count": 11,
+      "stake_pct": 6.44,
+      "rtt_ms": 65,
+      "providers": [
+        {
+          "name": "TeraSwitch Networks Inc.",
+          "count": 5,
+          "loc_pct": 46.3
+        },
+        {
+          "name": "OVH SAS",
+          "count": 4,
+          "loc_pct": 39.1
+        },
+        {
+          "name": "velia.net Internetdienste GmbH",
+          "count": 2,
+          "loc_pct": 14.6
+        }
+      ]
+    },
+    {
+      "city": "Amsterdam",
+      "country": "The Netherlands",
+      "cc": "NL",
+      "lat": 52.3098,
+      "lon": 4.9353,
+      "count": 12,
+      "stake_pct": 5.64,
+      "rtt_ms": 226,
+      "providers": [
+        {
+          "name": "Servers.com, Inc.",
+          "count": 3,
+          "loc_pct": 25.0
+        },
+        {
+          "name": "UAB Cherry Servers",
+          "count": 3,
+          "loc_pct": 25.0
+        },
+        {
+          "name": "Amarutu Technology Ltd",
+          "count": 2,
+          "loc_pct": 16.7
+        },
+        {
+          "name": "Fusix Networks B.V.",
+          "count": 1,
+          "loc_pct": 8.3
+        }
+      ]
+    },
+    {
+      "city": "Warsaw",
+      "country": "Poland",
+      "cc": "PL",
+      "lat": 52.1783,
+      "lon": 21.0602,
+      "count": 12,
+      "stake_pct": 5.64,
+      "rtt_ms": 229,
+      "providers": [
+        {
+          "name": "MEVSPACE sp. z o.o.",
+          "count": 11,
+          "loc_pct": 91.7
+        },
+        {
+          "name": "OVH SAS",
+          "count": 1,
+          "loc_pct": 8.3
+        }
+      ]
+    },
+    {
+      "city": "Stockholm",
+      "country": "Sweden",
+      "cc": "SE",
+      "lat": 59.3287,
+      "lon": 18.0717,
+      "count": 9,
+      "stake_pct": 4.87,
+      "rtt_ms": 265,
+      "providers": [
+        {
+          "name": "UAB Cherry Servers",
+          "count": 9,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Frankfurt am Main",
+      "country": "Germany",
+      "cc": "DE",
+      "lat": 50.1169,
+      "lon": 8.6837,
+      "count": 8,
+      "stake_pct": 4.4,
+      "rtt_ms": 239,
+      "providers": [
+        {
+          "name": "OVH SAS",
+          "count": 3,
+          "loc_pct": 32.1
+        },
+        {
+          "name": "Limestone Networks, Inc.",
+          "count": 1,
+          "loc_pct": 25.2
+        },
+        {
+          "name": "Michael Sebastian Schinzel trading as IP-Projects GmbH & Co. KG",
+          "count": 2,
+          "loc_pct": 21.4
+        },
+        {
+          "name": "Servers.com, Inc.",
+          "count": 1,
+          "loc_pct": 10.7
+        }
+      ]
+    },
+    {
+      "city": "New York",
+      "country": "United States",
+      "cc": "US",
+      "lat": 40.7126,
+      "lon": -74.0066,
+      "count": 7,
+      "stake_pct": 3.93,
+      "rtt_ms": 150,
+      "providers": [
+        {
+          "name": "Limestone Networks, Inc.",
+          "count": 2,
+          "loc_pct": 40.1
+        },
+        {
+          "name": "Latitude.sh",
+          "count": 2,
+          "loc_pct": 23.9
+        },
+        {
+          "name": "WebNX, Inc.",
+          "count": 1,
+          "loc_pct": 12.0
+        },
+        {
+          "name": "HOSTKEY",
+          "count": 1,
+          "loc_pct": 12.0
+        }
+      ]
+    },
+    {
+      "city": "North Sydney",
+      "country": "Australia",
+      "cc": "AU",
+      "lat": -33.8401,
+      "lon": 151.209,
+      "count": 8,
+      "stake_pct": 3.76,
+      "rtt_ms": 113,
+      "providers": [
+        {
+          "name": "OVH SAS",
+          "count": 8,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Gravelines",
+      "country": "France",
+      "cc": "FR",
+      "lat": 50.9871,
+      "lon": 2.1255,
+      "count": 6,
+      "stake_pct": 3.46,
+      "rtt_ms": 245,
+      "providers": [
+        {
+          "name": "OVH SAS",
+          "count": 6,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Montreal",
+      "country": "Canada",
+      "cc": "CA",
+      "lat": 45.5029,
+      "lon": -73.5723,
+      "count": 7,
+      "stake_pct": 3.29,
+      "rtt_ms": 167,
+      "providers": [
+        {
+          "name": "OVH SAS",
+          "count": 7,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Pittsburgh",
+      "country": "United States",
+      "cc": "US",
+      "lat": 40.4406,
+      "lon": -79.9958,
+      "count": 4,
+      "stake_pct": 3.11,
+      "rtt_ms": 132,
+      "providers": [
+        {
+          "name": "TeraSwitch Networks Inc.",
+          "count": 4,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Tokyo",
+      "country": "Japan",
+      "cc": "JP",
+      "lat": 35.6893,
+      "lon": 139.6899,
+      "count": 5,
+      "stake_pct": 2.99,
+      "rtt_ms": 0,
+      "providers": [
+        {
+          "name": "Limestone Networks, Inc.",
+          "count": 2,
+          "loc_pct": 52.8
+        },
+        {
+          "name": "Amarutu Technology Ltd",
+          "count": 1,
+          "loc_pct": 15.7
+        },
+        {
+          "name": "Netforest,Inc.",
+          "count": 1,
+          "loc_pct": 15.7
+        },
+        {
+          "name": "NTT-ME Corporation",
+          "count": 1,
+          "loc_pct": 15.7
+        }
+      ]
+    },
+    {
+      "city": "Vienna",
+      "country": "Austria",
+      "cc": "AT",
+      "lat": 48.1436,
+      "lon": 16.2941,
+      "count": 6,
+      "stake_pct": 2.82,
+      "rtt_ms": 243,
+      "providers": [
+        {
+          "name": "Nessus GmbH",
+          "count": 5,
+          "loc_pct": 83.3
+        },
+        {
+          "name": "IPAX GmbH",
+          "count": 1,
+          "loc_pct": 16.7
+        }
+      ]
+    },
+    {
+      "city": "Dallas",
+      "country": "United States",
+      "cc": "US",
+      "lat": 32.7797,
+      "lon": -96.8022,
+      "count": 6,
+      "stake_pct": 2.82,
+      "rtt_ms": 163,
+      "providers": [
+        {
+          "name": "Latitude.sh",
+          "count": 4,
+          "loc_pct": 66.7
+        },
+        {
+          "name": "Tier.Net Technologies LLC",
+          "count": 1,
+          "loc_pct": 16.7
+        },
+        {
+          "name": "HostRound LLC",
+          "count": 1,
+          "loc_pct": 16.7
+        }
+      ]
+    },
+    {
+      "city": "St Louis",
+      "country": "United States",
+      "cc": "US",
+      "lat": 38.6287,
+      "lon": -90.1988,
+      "count": 4,
+      "stake_pct": 1.88,
+      "rtt_ms": 162,
+      "providers": [
+        {
+          "name": "velia.net",
+          "count": 4,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Draper",
+      "country": "United States",
+      "cc": "US",
+      "lat": 40.5247,
+      "lon": -111.8638,
+      "count": 4,
+      "stake_pct": 1.88,
+      "rtt_ms": 102,
+      "providers": [
+        {
+          "name": "FiberState, LLC",
+          "count": 4,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "\u0160iauliai",
+      "country": "Lithuania",
+      "cc": "LT",
+      "lat": 55.9349,
+      "lon": 23.3137,
+      "count": 2,
+      "stake_pct": 1.58,
+      "rtt_ms": 274,
+      "providers": [
+        {
+          "name": "UAB Cherry Servers",
+          "count": 2,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Bluffdale",
+      "country": "United States",
+      "cc": "US",
+      "lat": 40.4896,
+      "lon": -111.9388,
+      "count": 2,
+      "stake_pct": 1.58,
+      "rtt_ms": 103,
+      "providers": [
+        {
+          "name": "TeraSwitch Networks Inc.",
+          "count": 2,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Nuremberg",
+      "country": "Germany",
+      "cc": "DE",
+      "lat": 49.4527,
+      "lon": 11.0783,
+      "count": 3,
+      "stake_pct": 1.41,
+      "rtt_ms": 262,
+      "providers": [
+        {
+          "name": "Hetzner Online GmbH",
+          "count": 2,
+          "loc_pct": 66.7
+        },
+        {
+          "name": "netcup GmbH",
+          "count": 1,
+          "loc_pct": 33.3
+        }
+      ]
+    },
+    {
+      "city": "Santa Clara",
+      "country": "United States",
+      "cc": "US",
+      "lat": 37.3541,
+      "lon": -121.9552,
+      "count": 3,
+      "stake_pct": 1.41,
+      "rtt_ms": 115,
+      "providers": [
+        {
+          "name": "GTHost",
+          "count": 3,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Istanbul",
+      "country": "Turkey",
+      "cc": "TR",
+      "lat": 40.917,
+      "lon": 29.2001,
+      "count": 3,
+      "stake_pct": 1.41,
+      "rtt_ms": 148,
+      "providers": [
+        {
+          "name": "Superonline Iletisim Hizmetleri A.S.",
+          "count": 3,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Secaucus",
+      "country": "United States",
+      "cc": "US",
+      "lat": 40.7862,
+      "lon": -74.0743,
+      "count": 3,
+      "stake_pct": 1.41,
+      "rtt_ms": 165,
+      "providers": [
+        {
+          "name": "Interserver, Inc",
+          "count": 3,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Newark",
+      "country": "United States",
+      "cc": "US",
+      "lat": 40.7356,
+      "lon": -74.1723,
+      "count": 2,
+      "stake_pct": 0.94,
+      "rtt_ms": 139,
+      "providers": [
+        {
+          "name": "TeraSwitch Networks Inc.",
+          "count": 2,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Wattrelos",
+      "country": "France",
+      "cc": "FR",
+      "lat": 50.7012,
+      "lon": 3.215,
+      "count": 2,
+      "stake_pct": 0.94,
+      "rtt_ms": 248,
+      "providers": [
+        {
+          "name": "OVH SAS",
+          "count": 2,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Englewood Cliffs",
+      "country": "United States",
+      "cc": "US",
+      "lat": 40.8854,
+      "lon": -73.9524,
+      "count": 2,
+      "stake_pct": 0.94,
+      "rtt_ms": 168,
+      "providers": [
+        {
+          "name": "Interserver, Inc",
+          "count": 2,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Chicago",
+      "country": "United States",
+      "cc": "US",
+      "lat": 41.8483,
+      "lon": -87.6517,
+      "count": 2,
+      "stake_pct": 0.94,
+      "rtt_ms": 154,
+      "providers": [
+        {
+          "name": "UAB Cherry Servers",
+          "count": 2,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Dublin",
+      "country": "Ireland",
+      "cc": "IE",
+      "lat": 53.3498,
+      "lon": -6.2603,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 244,
+      "providers": [
+        {
+          "name": "Blacknight Internet Solutions Limited",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Bucharest",
+      "country": "Romania",
+      "cc": "RO",
+      "lat": 44.4268,
+      "lon": 26.1025,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 285,
+      "providers": [
+        {
+          "name": "01NODE FUNDING SRL",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Seoul",
+      "country": "South Korea",
+      "cc": "KR",
+      "lat": 37.5658,
+      "lon": 126.978,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": null,
+      "providers": [
+        {
+          "name": "Equinix (EMEA) Acquisition Enterprises B.V.",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Frankfurt (Oder)",
+      "country": "Germany",
+      "cc": "DE",
+      "lat": 52.3484,
+      "lon": 14.5546,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": null,
+      "providers": [
+        {
+          "name": "Latitude.sh",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Langenzersdorf",
+      "country": "Austria",
+      "cc": "AT",
+      "lat": 48.301,
+      "lon": 16.3448,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 264,
+      "providers": [
+        {
+          "name": "Evolus IT Solutions GmbH",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Valletta",
+      "country": "Malta",
+      "cc": "MT",
+      "lat": 35.8992,
+      "lon": 14.5141,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 256,
+      "providers": [
+        {
+          "name": "Skoed Limited",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Novosibirsk",
+      "country": "Russia",
+      "cc": "RU",
+      "lat": 55.0386,
+      "lon": 82.9425,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 233,
+      "providers": [
+        {
+          "name": "Adman LLC",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Boston",
+      "country": "United States",
+      "cc": "US",
+      "lat": 42.3464,
+      "lon": -71.0975,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 157,
+      "providers": [
+        {
+          "name": "Markley Network Services, LLC",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Tsuen Wan",
+      "country": "Hong Kong",
+      "cc": "HK",
+      "lat": 22.3638,
+      "lon": 114.1091,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 48,
+      "providers": [
+        {
+          "name": "FOUNTAINHEAD TECHNOLOGIES LIMITED",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Limburg an der Lahn",
+      "country": "Germany",
+      "cc": "DE",
+      "lat": 50.3986,
+      "lon": 8.0796,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 256,
+      "providers": [
+        {
+          "name": "OVH SAS",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "New Orleans",
+      "country": "United States",
+      "cc": "US",
+      "lat": 29.9734,
+      "lon": -90.0885,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 180,
+      "providers": [
+        {
+          "name": "DartPoints Operating Company, LLC",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Munich",
+      "country": "Germany",
+      "cc": "DE",
+      "lat": 48.1428,
+      "lon": 11.5801,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": null,
+      "providers": [
+        {
+          "name": "RETN Limited",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Bratislava",
+      "country": "Slovakia",
+      "cc": "SK",
+      "lat": 48.1225,
+      "lon": 17.1393,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 232,
+      "providers": [
+        {
+          "name": "VNET a.s.",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Sandy",
+      "country": "United States",
+      "cc": "US",
+      "lat": 40.576,
+      "lon": -111.8788,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 112,
+      "providers": [
+        {
+          "name": "Google Fiber Inc.",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Drimoleague",
+      "country": "Ireland",
+      "cc": "IE",
+      "lat": 51.6471,
+      "lon": -9.2624,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": null,
+      "providers": [
+        {
+          "name": "Digiweb ltd",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Mumbai",
+      "country": "India",
+      "cc": "IN",
+      "lat": 19.0748,
+      "lon": 72.8856,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 268,
+      "providers": [
+        {
+          "name": "OVH SAS",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Berlin",
+      "country": "Germany",
+      "cc": "DE",
+      "lat": 52.5196,
+      "lon": 13.4069,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 254,
+      "providers": [
+        {
+          "name": "Evolus IT Solutions GmbH",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Strasbourg",
+      "country": "France",
+      "cc": "FR",
+      "lat": 48.5734,
+      "lon": 7.7521,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 255,
+      "providers": [
+        {
+          "name": "OVH SAS",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Waldbrunn",
+      "country": "Germany",
+      "cc": "DE",
+      "lat": 49.7581,
+      "lon": 9.8069,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 240,
+      "providers": [
+        {
+          "name": "Michael Sebastian Schinzel trading as IP-Projects GmbH & Co. KG",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Frankfurt",
+      "country": "Germany",
+      "cc": "DE",
+      "lat": 50.1109,
+      "lon": 8.6821,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 213,
+      "providers": [
+        {
+          "name": "TeraSwitch Networks Inc.",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Bangkok",
+      "country": "Thailand",
+      "cc": "TH",
+      "lat": 13.7749,
+      "lon": 100.5197,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 94,
+      "providers": [
+        {
+          "name": "CLOUDFOREST CO., LTD.",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Leihgestern",
+      "country": "Germany",
+      "cc": "DE",
+      "lat": 50.5379,
+      "lon": 8.6502,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 213,
+      "providers": [
+        {
+          "name": "uvensys GmbH",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Los Angeles",
+      "country": "United States",
+      "cc": "US",
+      "lat": 34.0544,
+      "lon": -118.244,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 108,
+      "providers": [
+        {
+          "name": "Latitude.sh",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Moscow",
+      "country": "Russia",
+      "cc": "RU",
+      "lat": 55.7487,
+      "lon": 37.6187,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 282,
+      "providers": [
+        {
+          "name": "JSC Selectel",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Fechenheim",
+      "country": "Germany",
+      "cc": "DE",
+      "lat": 50.121,
+      "lon": 8.747,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": null,
+      "providers": [
+        {
+          "name": "Allnodes Inc",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Teterboro",
+      "country": "United States",
+      "cc": "US",
+      "lat": 40.866,
+      "lon": -74.0544,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 173,
+      "providers": [
+        {
+          "name": "Interserver, Inc",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    },
+    {
+      "city": "Haarlem",
+      "country": "The Netherlands",
+      "cc": "NL",
+      "lat": 52.3913,
+      "lon": 4.6654,
+      "count": 1,
+      "stake_pct": 0.47,
+      "rtt_ms": 228,
+      "providers": [
+        {
+          "name": "Servers.com, Inc.",
+          "count": 1,
+          "loc_pct": 100.0
+        }
+      ]
+    }
+  ]
+}

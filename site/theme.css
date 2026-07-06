@@ -1,0 +1,107 @@
+/* Theme tokens for the standalone Monad Stake Geography page.
+   Extracted from the shared ProofLine site stylesheet so the map renders
+   correctly when this repo's site/ is served on its own. */
+:root {
+  --bg: #0b0d12;
+  --surface: #12151c;
+  --surface-2: #171b23;
+  --surface-3: #1d2330;
+  --text: #f8fafc;
+  --text-soft: #d7dfeb;
+  --text-muted: #94a3b8;
+  --muted: #64748b;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(139, 92, 246, 0.32);
+  --accent: #8b5cf6;
+  --accent-hover: #7c3aed;
+  --accent-2: #22d3ee;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --shadow-lg: 0 30px 80px rgba(0, 0, 0, 0.42);
+  --shadow-md: 0 18px 48px rgba(0, 0, 0, 0.28);
+  --radius-xl: 28px;
+  --radius-lg: 22px;
+  --radius-md: 18px;
+  --radius-sm: 14px;
+  --max-width: 1320px;
+}
+
+body {
+  background: var(--bg, #0a0b0f);
+  color: var(--text, #e6e8ee);
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  margin: 0;
+}
+
+.app-shell {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.brand-stack strong {
+  display: block;
+  letter-spacing: 0.08em;
+}
+
+.brand-stack span {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.site-nav {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.site-nav a {
+  color: var(--text-soft);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.site-nav a:hover {
+  color: var(--text);
+}
+
+.nav-cta {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.nav-cta:hover {
+  background: var(--accent-hover);
+}

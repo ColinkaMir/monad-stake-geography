@@ -1,0 +1,17 @@
+# Pipeline working data (intermediate, may contain per-validator IPs — never commit)
+/data/
+data/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Editor / OS
+*.bak
+*.bak-*
+*.swp
+.DS_Store
