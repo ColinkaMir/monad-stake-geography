@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""Measure ICMP RTT from this vantage to every unique validator IP.
+"""Measure ICMP RTT from this node (JP testnet) to every unique validator IP.
 
-Self-contained raw-socket pinger (no fping/ping binary, no package installs).
+Self-contained raw-socket pinger (no fping/ping binary, no apt installs).
 Must run as root for SOCK_RAW ICMP: `sudo python3 measure_rtt.py`.
 
 Gentle by design: a handful of echo requests per host, modest concurrency,
-short timeout. These are real operators' peer endpoints, so ICMP echo is
-benign and low-volume.
+short timeout. These are real operators' peer endpoints we already exchange
+raptorcast traffic with, so ICMP echo is benign and low-volume.
 
 Output: rtt-measurements.json keyed by IP with min/avg/max ms + packet loss.
-Opsec: only AGGREGATE latency (by country/ASN/continent) is ever published,
-never per-validator IP->RTT rows.
+Opsec: this stays in the KB; only AGGREGATE latency (by country/ASN/continent)
+is ever published, never per-validator IP->RTT rows.
 """
 import json
 import os
@@ -21,15 +21,14 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
 
-SRC = os.getenv("GEO_RTT_SRC", "./data/validators-geoip.json")
-OUT = os.getenv("GEO_RTT_OUT", "./data/rtt-measurements.json")
-VANTAGE_LABEL = os.getenv("GEO_VANTAGE_LABEL", "vantage")
+SRC = os.getenv("GEO_RTT_SRC", "validators-geoip.json")
+OUT = os.getenv("GEO_RTT_OUT", "rtt-measurements.json")
 PACKETS = 5          # echo requests per host
 INTERVAL = 0.2       # seconds between packets to one host
 TIMEOUT = 2.0        # per-packet wait
 WORKERS = 16         # concurrent hosts (spreads load, not a burst per host)
 # Sanity floor: any per-host avg below this many ms is a physical impossibility
-# for a real remote validator (a genuine long-haul hop is tens of ms). Such
+# for a real remote validator (a genuine Tokyo->remote hop is >=~30 ms). Such
 # sub-floor RTTs are ICMP error replies from a nearby router that leaked in as
 # a successful echo, so we discard them and treat the host as unreachable.
 RTT_MIN_MS = float(os.getenv("GEO_RTT_MIN_MS", "0"))
@@ -129,14 +128,13 @@ def main():
     reachable = sum(1 for r in results.values() if r.get("recv", 0) > 0)
     out = {
         "generated_at_epoch": int(time.time()),
-        "vantage": VANTAGE_LABEL,
+        "vantage": "czech-prague",
         "method": "icmp-echo",
         "packets_per_host": PACKETS,
         "total_ips": len(ips),
         "reachable_ips": reachable,
         "measurements": results,
     }
-    os.makedirs(os.path.dirname(OUT) or ".", exist_ok=True)
     json.dump(out, open(OUT, "w"), indent=2)
     print(f"done in {time.time()-t0:.0f}s | reachable {reachable}/{len(ips)} "
           f"({100*reachable/len(ips):.0f}%) | wrote {OUT}")

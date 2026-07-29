@@ -13,7 +13,7 @@ import os
 import sys
 import time
 
-DIR = os.getenv("GEO_ACC_DIR", "./data")
+DIR = os.getenv("GEO_ACC_DIR", "/home/admin/monad-knowledge-base/tools/geo-latency")
 ROUND = f"{DIR}/rtt-measurements.json"
 SAMPLES = f"{DIR}/rtt-epoch-samples.json"
 OUT = f"{DIR}/rtt-averaged.json"

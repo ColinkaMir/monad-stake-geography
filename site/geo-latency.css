@@ -863,3 +863,100 @@
   .geo-blast-row { grid-template-columns: 116px 1fr 50px; gap: 8px; }
   .geo-blast-label { font-size: 0.72rem; }
 }
+
+/* --- Network signals: auto-generated read of the current snapshot --- */
+.geo-signals-card {
+  margin-top: 22px;
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+.geo-signals-title { margin: 0 0 6px; font-size: 1rem; }
+.geo-signals-sub { margin: 0 0 16px; font-size: 0.82rem; color: var(--text-soft); }
+.signal-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.signal {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  align-items: start;
+  gap: 10px;
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+.signal-dot {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  text-align: center;
+  font-family: "JetBrains Mono", monospace;
+}
+.signal-text { color: var(--text); }
+.signal-loading { color: var(--text-soft); border-left-color: var(--border); }
+.signal-critical { border-left-color: var(--rtt-far); }
+.signal-critical .signal-dot { color: var(--rtt-far); }
+.signal-warn { border-left-color: var(--rtt-mid); }
+.signal-warn .signal-dot { color: var(--rtt-mid); }
+.signal-info { border-left-color: var(--geo-eu); }
+.signal-info .signal-dot { color: var(--geo-eu); }
+.signal-good { border-left-color: var(--rtt-near); }
+.signal-good .signal-dot { color: var(--rtt-near); }
+@media (max-width: 640px) {
+  .signal { font-size: 0.8rem; padding: 10px 11px; }
+}
+
+/* --- Trends over time: inline-SVG line charts --- */
+.trend-status { color: var(--text-soft); font-size: 0.82rem; }
+/* Flexbox, not grid: a CSS-grid auto row mis-sizes with the replaced SVG inside
+   (row froze at 300px and clipped the legend). Flex items size to their own
+   content height, so each card grows to fit its chart + full legend. */
+.geo-trends-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: flex-start;
+}
+/* min-height, not auto: the card's auto-height under-counts (~300px) because the
+   inline SVG contributes its 150px replaced default during sizing, clipping the
+   legend. A fixed floor comfortably fits the chart (176px) + the longest legend
+   (5 rows). */
+.geo-trends-grid .geo-chart-card { flex: 1 1 320px; min-width: 0; min-height: 400px; }
+.trend-chart { margin-top: 6px; }
+/* Explicit-height canvas wrapper: gives the card a deterministic height so the
+   grid row sizes correctly and the legend never spills past the card. A bare
+   width:100%/height:auto SVG falls back to the 150px replaced-element default
+   during row sizing, which under-sized the card and clipped the legend. */
+.trend-canvas { width: 100%; height: 176px; }
+.tl-svg { width: 100%; height: 100%; display: block; }
+.tl-grid { stroke: var(--border); stroke-width: 1; opacity: 0.5; }
+.tl-ytick { fill: var(--text-soft); font-size: 9px; font-family: "JetBrains Mono", monospace; }
+.tl-legend {
+  list-style: none; margin: 12px 0 0; padding: 0;
+  display: flex; flex-direction: column; gap: 7px;
+}
+.tl-legend li {
+  display: grid;
+  grid-template-columns: 14px 1fr auto auto auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+}
+.tl-swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.tl-name { color: var(--text-soft); }
+.tl-legend b { font-family: "JetBrains Mono", monospace; font-size: 0.82rem; }
+.tl-delta {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+.tl-delta.tl-up { color: #34d399; }
+.tl-delta.tl-down { color: #f87171; }
+.tl-delta.tl-flat { color: var(--text-soft); }
+.tl-delta.tl-na { opacity: 0.5; }

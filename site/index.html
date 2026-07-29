@@ -3,26 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Monad Stake Geography - Geo-Latency Map</title>
-  <meta name="description" content="Where Monad validator stake actually lives: continent, country, and hosting-provider concentration, with ICMP round-trip latency measured off-node from a vantage point.">
+  <title>Monad Geo-Latency Map - Prooflines</title>
+  <!-- Open Graph / social link preview -->
+  <meta property="og:title" content="Monad Geo-Latency Map - Prooflines">
+  <meta property="og:description" content="Where Monad validator stake actually lives: continent, country, and hosting-provider concentration, with ICMP round-trip latency measured from a Prague vantage point.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://prooflines.org/monad/geo-latency/">
+  <meta property="og:image" content="https://prooflines.org/og/geo-latency.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:site_name" content="Prooflines">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Monad Geo-Latency Map - Prooflines">
+  <meta name="twitter:description" content="Where Monad validator stake actually lives: continent, country, and hosting-provider concentration, with ICMP round-trip latency measured from a Prague vantage point.">
+  <meta name="twitter:image" content="https://prooflines.org/og/geo-latency.png">
+
+  <meta name="description" content="Where Monad validator stake actually lives: continent, country, and hosting-provider concentration, with ICMP round-trip latency measured from a Prague vantage point.">
   <link rel="canonical" href="https://prooflines.org/monad/geo-latency/">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon-proofline.svg">
+  <link rel="shortcut icon" href="../assets/favicon-proofline.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-  <link rel="stylesheet" href="theme.css">
-  <link rel="stylesheet" href="geo-latency.css">
-  <link rel="preload" href="./geo-latency-data.json" as="fetch" crossorigin>
+  <link rel="stylesheet" href="../styles.css?v=20260428a">
+  <link rel="stylesheet" href="geo-latency.css?v=20260713i">
+  <link rel="preload" href="./geo-latency-data-mainnet.json" as="fetch" crossorigin>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
-  <script src="geo-latency.js" defer></script>
+  <script src="geo-latency.js?v=20260725m" defer></script>
 </head>
 <body>
   <div class="app-shell">
     <header class="site-header">
-      <a class="brand" href="https://prooflines.org/monad/" aria-label="ProofLine home">
+      <a class="brand" href="../../index.html" aria-label="Prooflines home">
+        <img class="brand-logo" src="../assets/logo-consensus-grid.svg" alt="Prooflines logo">
         <span class="brand-stack">
-          <strong>PROOFLINE</strong>
-          <span>Monad Stake Geography</span>
+          <strong>PROOFLINES</strong>
+          <span>Monad Geo-Latency Map</span>
         </span>
       </a>
       <div class="header-actions">
@@ -30,8 +48,9 @@
           <a href="#overview">Overview</a>
           <a href="#map">Map</a>
           <a href="#countries">Countries</a>
+          <a href="#trends">Trends</a>
           <a href="#methodology">Methodology</a>
-          <a href="https://prooflines.org/monad/sentinel/">Sentinel</a>
+          <a href="../sentinel/">Sentinel</a>
         </nav>
         <a class="nav-cta" href="https://github.com/ColinkaMir/monad-stake-geography" target="_blank" rel="noopener">GitHub</a>
       </div>
@@ -41,7 +60,7 @@
       <section class="section geo-dash geo-dash-top" id="overview">
         <div class="geo-meta-row">
           <span class="live-badge"><i></i>Epoch <span id="meta-epoch">-</span> snapshot</span>
-          <span class="pill geo-vantage-pill">Vantage: Japan (Tokyo)</span>
+          <span class="pill geo-vantage-pill">Vantage: Czech (Prague)</span>
           <span class="intel-badge" id="coverage-badge">Loading …</span>
           <div class="net-tabs" role="tablist" aria-label="Network">
             <button class="net-tab is-active" type="button" role="tab" aria-selected="true" id="testnet-tab">Testnet</button>
@@ -55,7 +74,7 @@
               <button class="info-btn" type="button" aria-label="What this shows" aria-expanded="false">i</button>
               <span class="info-pop" role="tooltip">
                 <strong>Stake concentration at a glance.</strong>
-                Continent split, round-trip latency from our <span class="v-vantage">Tokyo full-node</span>, the countries that hold the stake,
+                Continent split, round-trip latency from our <span class="v-vantage">Prague server</span>, the countries that hold the stake,
                 and the hosting ASNs underneath them. No single provider is dominant, but provider diversity is shallower than the country map suggests.
               </span>
             </span>
@@ -81,7 +100,7 @@
           <article class="geo-stat">
             <span>RTT reachable</span>
             <strong id="hl-reachable">…</strong>
-            <small>Hosts we can time (ICMP from <span class="v-short">JP</span>); geo &amp; stake known for all</small>
+            <small>Hosts reachable by ICMP ping</small>
           </article>
         </div>
 
@@ -96,9 +115,9 @@
           </article>
 
           <article class="geo-chart-card">
-            <h3>Latency from <span class="v-place">Japan</span></h3>
+            <h3>Latency from <span class="v-place">Prague</span></h3>
             <div class="minibars" id="latency-bars" aria-label="Round-trip latency by continent"></div>
-            <p class="card-caption" id="latency-caption">Stake-weighted median ICMP round-trip from our <span class="v-vantage">Tokyo full-node</span>, by continent.</p>
+            <p class="card-caption" id="latency-caption">Stake-weighted median ICMP round-trip from our <span class="v-vantage">Prague server</span>, by continent.</p>
           </article>
 
           <article class="geo-chart-card">
@@ -127,13 +146,21 @@
           <p class="geo-blast-sub">The 1/3 BFT line is where a single correlated failure can halt the chain. No single provider or country crosses it &mdash; but one legal jurisdiction does.</p>
           <div class="geo-blast-ladder" id="blast-ladder"></div>
         </div>
+
+        <div class="geo-signals-card" id="geo-signals" aria-label="Network decentralization signals">
+          <h3 class="geo-signals-title">Network signals</h3>
+          <p class="geo-signals-sub">An automatic read of this snapshot &mdash; the concentration, geography, and latency risks worth watching, straight from the aggregates above.</p>
+          <ul class="signal-list" id="signal-list">
+            <li class="signal signal-loading">Loading &hellip;</li>
+          </ul>
+        </div>
       </section>
 
       <section class="section" id="map">
         <h2 class="map-title">World Map</h2>
         <p class="section-intro map-intro">
           Each bubble is a city/datacenter location. <strong>Size</strong> = share of total stake hosted there.
-          <strong>Color</strong> = round-trip latency to that location from our <span class="v-vantage">Tokyo full-node</span>. Click a bubble for
+          <strong>Color</strong> = round-trip latency to that location from our <span class="v-vantage">Prague server</span>. Click a bubble for
           node count, stake share, latency, and the hosting providers in that location. Locations only &mdash;
           no individual validators.
         </p>
@@ -187,6 +214,24 @@
 
       </section>
 
+      <section class="section" id="trends">
+        <h2 class="map-title">Trends over time</h2>
+        <p class="section-intro map-intro">
+          How the stake geography is shifting. History accumulates from our snapshots &mdash; one point per day.
+          <span id="trend-status" class="trend-status"></span>
+        </p>
+        <div class="geo-trends-grid">
+          <article class="geo-chart-card">
+            <h3>Regional stake share over time</h3>
+            <div class="trend-chart" id="trend-continents"></div>
+          </article>
+          <article class="geo-chart-card">
+            <h3>Top countries stake share over time</h3>
+            <div class="trend-chart" id="trend-countries"></div>
+          </article>
+        </div>
+      </section>
+
       <section class="section note-section" id="methodology">
         <div class="footer-card">
           <div>
@@ -195,20 +240,21 @@
             <ul class="method-list">
               <li><strong>Stake</strong> = on-chain stake snapshot at the epoch shown, used to weight every aggregate.</li>
               <li><strong>Geo-location</strong> = public peer endpoints joined to the validator directory, enriched with a GeoIP lookup. ASN/provider is reliable; city is approximate.</li>
-              <li><strong>RTT from <span class="v-short">JP</span></strong> = ICMP echo from our <span class="v-vantage">Tokyo full-node</span> (5 packets/host), re-measured hourly through the epoch; the published figure is the average of all rounds so far, as a stake-weighted median over reachable hosts. Some hosts block ICMP and are excluded from the latency figure only, not from stake.</li>
+              <li><strong>RTT from <span class="v-short">JP</span></strong> = ICMP echo from our <span class="v-vantage">Prague server</span> (5 packets/host), re-measured hourly through the epoch; the published figure is the average of all rounds so far, as a stake-weighted median over reachable hosts. Some hosts block ICMP and are excluded from the latency figure only, not from stake.</li>
               <li><strong>Continents</strong> = coarse buckets (EU / NA / APAC / Other) by country code, for a quick decentralization read.</li>
               <li><strong>33% BFT line</strong> = the share of stake above which a single correlated failure starts to threaten liveness; shown against the largest single provider (one correlated-failure domain). We also note how few providers it takes to reach 1/3 of stake, as a concentration-depth read.</li>
+              <li><strong>Trends</strong> = one snapshot of these same aggregates is stored per day; the trend charts and 7d / 30d deltas are computed from that rolling history. There is no back-fill, so history begins the day this feature went live.</li>
               <li><strong>Aggregates only</strong> = this page publishes continent / country / ASN aggregates only. Per-validator IP, name, and city mappings are kept private on purpose.</li>
               <li><strong>Not a criticism of any operator</strong> = mainstream hosts are the rational default. The goal is to make the ASN-concentration number visible next to the country numbers.</li>
             </ul>
           </div>
           <div class="footer-actions footer-actions-vertical">
             <a class="button button-primary" href="#overview">Back to top</a>
-            <a class="button button-secondary" href="https://prooflines.org/monad/">Open Monad Hub</a>
+            <a class="button button-secondary" href="../">Open Monad Hub</a>
           </div>
         </div>
         <div class="footer">
-          ProofLine · Monad Stake Geography · stake-weighted geography and latency for the Monad validator set, aggregates only.
+          Prooflines · Monad Geo-Latency Map · stake-weighted geography and latency for the testnet validator set, aggregates only.
         </div>
       </section>
     </main>

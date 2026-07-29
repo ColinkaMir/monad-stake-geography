@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Enrich validators-with-ips.json using ip-api.com batch endpoint (free tier).
-Up to 100 IPs per batch request; we throttle ~1 batch per 4 seconds to stay safe.
+Up to 100 IPs per batch request; we'll throttle ~1 batch per 4 seconds to stay safe.
 """
 import json
 import os
@@ -8,8 +8,8 @@ import time
 import urllib.request
 from pathlib import Path
 
-IN_FILE = os.getenv("GEO_GEOIP_IN", "./data/validators-with-ips.json")
-OUT_FILE = os.getenv("GEO_GEOIP_OUT", "./data/validators-geoip.json")
+IN_FILE = os.getenv("GEO_GEOIP_IN", "/home/admin/monad-knowledge-base/tools/geo-latency/validators-with-ips.json")
+OUT_FILE = os.getenv("GEO_GEOIP_OUT", "/home/admin/monad-knowledge-base/tools/geo-latency/validators-geoip.json")
 API_BATCH = "http://ip-api.com/batch?fields=status,country,countryCode,regionName,city,lat,lon,isp,org,as,query"
 
 
@@ -70,7 +70,6 @@ def main():
     # rebuild output
     with_geo = sum(1 for v in validators if v.get("geo"))
     data["validators_with_geo"] = with_geo
-    Path(OUT_FILE).parent.mkdir(parents=True, exist_ok=True)
     Path(OUT_FILE).write_text(json.dumps(data, indent=2))
     print(f"wrote {OUT_FILE}")
     print(f"  validators with full geo: {with_geo}/{len(validators)} ({100*with_geo/len(validators):.1f}%)")

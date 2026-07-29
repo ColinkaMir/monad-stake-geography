@@ -12,7 +12,7 @@ On Monad's validator set the encouraging news is that **no single hosting provid
 
 ## How it works
 
-1. **Discovery (off-node).** Validator IP endpoints come from the [monad-sonar](https://github.com/ColinkaMir/monad-sonar) public peer feed — you read the network's peers without running a node. (The testnet path can alternatively read a local node's `peers.toml`.)
+1. **Discovery (off-node).** Validator IP endpoints come from the [monad-sonar](https://github.com/ColinkaMir/monad-sonar) public peer feeds — you read the network's peers without running a node. Both networks (testnet and mainnet) run fully node-independent.
 2. **On-chain stake.** The active set, per-validator stake, and secp keys are read from the Monad staking precompile over public RPC (`getEpoch` / `getConsensusSet` / `getValidator`), so every aggregate is stake-weighted by real on-chain stake.
 3. **Geolocation.** Each unique IP is enriched via [ip-api.com](https://ip-api.com) → country, city (approximate), and ASN/hosting provider (reliable).
 4. **Latency.** ICMP echo (5 packets/host) is measured from a single vantage, re-measured through the epoch and averaged, then reduced to a stake-weighted median per bucket.
@@ -26,19 +26,13 @@ Monad, like other BFT chains, tolerates faults up to (but not including) **1/3 o
 
 Two paths, converging on the same GeoIP → RTT → aggregate stages. `measure_rtt.py` opens a raw ICMP socket and needs root / `CAP_NET_RAW`; everything else runs unprivileged.
 
-**Testnet** (IPs from a local node's config):
-
-```
-parse_peers.py -> enrich_geoip.py -> measure_rtt.py -> accumulate_rtt_samples.py -> build_public_json.py
-```
-
-**Mainnet** (IPs off-node via monad-sonar):
+Both networks share one off-node path (testnet formerly supported reading a local node's `peers.toml` via `parse_peers.py`, kept for reference):
 
 ```
 fetch_mainnet_validators.py -> enrich_geoip.py -> measure_rtt.py -> accumulate_rtt_samples.py -> build_public_json.py
 ```
 
-See `pipeline/run_pipeline.example.sh` for a documented, copy-and-edit runner. Every stage is configured through environment variables:
+See `pipeline/run_pipeline_mainnet.example.sh` and `pipeline/run_pipeline_testnet.example.sh` for the production runners (copy and edit paths). RTT vantage since 2026-07-11: Prague, Europe (Tokyo before). The live map defaults to the mainnet view; `#testnet` opens the testnet view. Every stage is configured through environment variables:
 
 | Variable | Purpose |
 | --- | --- |

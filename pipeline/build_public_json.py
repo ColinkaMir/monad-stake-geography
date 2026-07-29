@@ -1,29 +1,29 @@
 #!/usr/bin/env python3
-"""Build the PUBLIC geo-latency JSON for the map frontend.
+"""Build the PUBLIC geo-latency JSON for prooflines.org/monad/geo-latency.
 
 Contains ONLY aggregates (continent / country / ASN), stake-weighted, plus
-stake-weighted-median ICMP RTT from the vantage where reachable. NEVER emits
-per-validator IP / name / city. The opsec boundary lives here.
+stake-weighted-median ICMP RTT from the JP vantage where reachable. NEVER
+emits per-validator IP / name / city. Opsec boundary lives here.
 
-Inputs:  validators-geoip.json, rtt-averaged.json
-Output:  ./site/geo-latency-data.json
+Inputs:  validators-geoip.json, rtt-measurements.json
+Output:  ../outputs/proofline-public-live/geo-latency/geo-latency-data.json
 """
 import json
 import os
 import time
 from collections import defaultdict
 
-GEO = os.getenv("GEO_BUILD_GEO", "./data/validators-geoip.json")
-RTT = os.getenv("GEO_BUILD_RTT", "./data/rtt-averaged.json")
-OUT = os.getenv("GEO_BUILD_OUT", "./site/geo-latency-data.json")
+GEO = os.getenv("GEO_BUILD_GEO", "validators-geoip.json")
+RTT = os.getenv("GEO_BUILD_RTT", "rtt-averaged.json")
+OUT = os.getenv("GEO_BUILD_OUT", "/home/admin/monad-knowledge-base/outputs/proofline-public-live/geo-latency/geo-latency-data.json")
 # Defensive RTT sanity floor (mirrors measure_rtt.py / accumulate_rtt_samples.py):
 # any avg_ms below this is a router ICMP-error artifact, not a real remote hop.
 # Treat such a host as having no valid RTT so it pollutes neither the aggregates
 # nor the per-point map RTT.
 RTT_MIN_MS = float(os.getenv("GEO_RTT_MIN_MS", "0"))
 # Drop map points that have no valid RTT (they render as broken grey "n/a" dots).
-# Off by default so a testnet feed's map is unchanged; enable it explicitly for
-# the mainnet refresh.
+# Off by default so the testnet feed's map is unchanged; the mainnet refresh
+# enables it explicitly.
 DROP_NULL_RTT_MAP = os.getenv("GEO_MAP_DROP_NULL_RTT", "0") not in ("0", "", "false", "False")
 
 EU = {"DE","FI","PL","FR","NL","GB","IE","SE","NO","DK","ES","IT","PT","AT",
@@ -51,6 +51,101 @@ def wmedian(pairs):
         if acc >= total / 2:
             return round(v)
     return round(pairs[-1][0])
+
+
+def _short(name):
+    """First token of a provider/ASN name for compact signal text."""
+    return str(name or "").split(",")[0].split(" (")[0].strip()
+
+
+def compute_signals(continents, countries, providers, headline):
+    """Derive narrative decentralization signals from the current aggregates.
+
+    Pure function over the already-public aggregate sections (continents,
+    countries, providers, headline) — NEVER touches per-validator data, so it
+    stays inside the same opsec boundary as the rest of this feed. Deterministic,
+    history-free: every signal is a fact about THIS snapshot. Returns a list of
+    {level, text} sorted by severity (critical > warn > info > good), capped.
+    """
+    sig = []
+    bft = headline.get("bft_threshold_pct", 33.3)
+
+    # 1) Provider concentration — emit the single strongest read. Keep the page's
+    # BFT framing: the 33% line applies to ONE correlated-failure domain (a single
+    # provider), so only a lone provider crossing it is a "critical". Top-2/top-4
+    # are concentration DEPTH context, never phrased as crossing the BFT line.
+    if providers:
+        p0 = providers[0]
+        top4 = headline.get("top4_provider_stake_pct", 0)
+        # depth: how many providers combine to first reach 1/3 of stake
+        depth = len(providers)
+        for i, p in enumerate(providers):
+            if p.get("cum_pct", 0) >= bft:
+                depth = i + 1
+                break
+        if p0["stake_pct"] >= bft:
+            sig.append({"level": "critical",
+                "text": _short(p0["name"]) + " alone hosts " + str(p0["stake_pct"])
+                        + "% of stake — past the " + str(bft)
+                        + "% BFT line, so one provider failure could stall consensus."})
+        elif depth <= 3:
+            sig.append({"level": "warn",
+                "text": "Just " + str(depth) + " providers combine to reach 1/3 of stake ("
+                        + _short(p0["name"]) + " leads at " + str(p0["stake_pct"])
+                        + "%) — shallow provider diversity, though no single host crosses the "
+                        + str(bft) + "% line."})
+        elif top4 >= 50:
+            sig.append({"level": "info",
+                "text": "Top 4 providers control " + str(top4)
+                        + "% of stake — provider diversity is shallower than the country map suggests."})
+
+    # 2) Largest correlated-failure geography (region holding a majority of nodes).
+    if continents:
+        top_cont = max(continents, key=lambda c: c["count_pct"])
+        if top_cont["count_pct"] >= 50:
+            sig.append({"level": "warn",
+                "text": top_cont["name"] + " holds " + str(top_cont["count_pct"])
+                        + "% of nodes and " + str(top_cont["stake_pct"])
+                        + "% of stake — the network's largest geographic failure domain."})
+
+    # 3) Under-represented real region — a decentralization growth area.
+    real = [c for c in continents if c["name"] in ("EU", "NA", "APAC") and c["count"] > 0]
+    if real:
+        low = min(real, key=lambda c: c["count_pct"])
+        if low["count_pct"] < 12:
+            sig.append({"level": "info",
+                "text": low["name"] + " is thin at " + str(low["count_pct"]) + "% of nodes ("
+                        + str(low["count"]) + ") — a decentralization growth area."})
+
+    # 4) Country-level single-provider dependence (worst two with real presence).
+    dep = [c for c in countries if c["count"] >= 3 and c["top_provider_pct"] >= 60]
+    dep.sort(key=lambda c: (c["top_provider_pct"], c["stake_pct"]), reverse=True)
+    for c in dep[:2]:
+        lvl = "warn" if c["top_provider_pct"] >= 80 else "info"
+        sig.append({"level": lvl,
+            "text": c["name"] + " leans on one host — " + _short(c["top_provider"])
+                    + " holds " + str(c["top_provider_pct"]) + "% of its stake across "
+                    + str(c["count"]) + " nodes."})
+
+    # 5) Latency outlier — OUR unique angle (BitCtrl's geo map has no latency layer).
+    lat = [c for c in countries
+           if c.get("rtt_ms") is not None and c["rtt_ms"] >= 200 and c["stake_pct"] >= 3]
+    lat.sort(key=lambda c: c["rtt_ms"], reverse=True)
+    if lat:
+        c = lat[0]
+        sig.append({"level": "info",
+            "text": c["name"] + " sits " + str(c["rtt_ms"]) + " ms from the vantage with "
+                    + str(c["stake_pct"]) + "% of stake — a high-latency pocket for block propagation."})
+
+    # Positive read when nothing crosses the line — reinforces the healthy case.
+    if not any(s["level"] in ("critical", "warn") for s in sig):
+        sig.insert(0, {"level": "good",
+            "text": "No single provider or country crosses the " + str(bft)
+                    + "% BFT line — no lone correlated-failure domain can stall the chain."})
+
+    rank = {"critical": 0, "warn": 1, "info": 2, "good": 3}
+    sig.sort(key=lambda s: rank.get(s["level"], 9))
+    return sig[:6]
 
 
 def main():
@@ -203,15 +298,22 @@ def main():
     # them dynamically from providers[0..1], so this stays correct as the ranking rotates).
     top2 = round(sum(p["stake_pct"] for p in providers[:2]), 2)
 
+    headline = {
+        "top4_provider_stake_pct": top4,
+        "top2_provider_stake_pct": top2,
+        "bft_threshold_pct": 33.3,
+    }
+    signals = compute_signals(continents, countries, providers, headline)
+
     out = {
         "generated_at_epoch": int(time.time()),
         "generated_at_utc": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()),
         "epoch": vs[0].get("epoch") if vs else None,
-        "vantage": os.getenv("GEO_VANTAGE", "vantage"),
+        "vantage": os.getenv("GEO_VANTAGE", "Japan testnet full-node (Tokyo)"),
         "vantage_point": {
             "lat": float(os.getenv("GEO_VANTAGE_LAT", "35.6762")),
             "lon": float(os.getenv("GEO_VANTAGE_LON", "139.6503")),
-            "label": os.getenv("GEO_VANTAGE_LABEL", "vantage"),
+            "label": os.getenv("GEO_VANTAGE_LABEL", "ProofLines node \u00b7 Tokyo"),
         },
         "rtt_method": "ICMP echo, 5 packets/host, averaged over all rounds this epoch, stake-weighted median",
         "coverage": {
@@ -221,20 +323,17 @@ def main():
             "rtt_total_ips": rtt.get("total_ips"),
             "rtt_rounds": rtt.get("rounds"),
         },
-        "headline": {
-            "top4_provider_stake_pct": top4,
-            "top2_provider_stake_pct": top2,
-            "bft_threshold_pct": 33.3,
-        },
+        "headline": headline,
+        "signals": signals,
         "continents": continents,
         "countries": countries,
         "providers": providers,
         "map_points": map_points,
     }
-    os.makedirs(os.path.dirname(OUT) or ".", exist_ok=True)
+    os.makedirs(os.path.dirname(OUT), exist_ok=True)
     json.dump(out, open(OUT, "w"), indent=2)
     print(f"wrote {OUT}")
-    print(f"  continents={len(continents)} countries={len(countries)} providers={len(providers)} map_points={len(map_points)} (excluded {excluded_null_rtt} null-RTT locations)")
+    print(f"  continents={len(continents)} countries={len(countries)} providers={len(providers)} map_points={len(map_points)} signals={len(signals)} (excluded {excluded_null_rtt} null-RTT locations)")
     print(f"  top4={top4}% top2={top2}%")
 
 

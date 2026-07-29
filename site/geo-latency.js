@@ -119,6 +119,27 @@
     }
   }
 
+  var SIGNAL_ICON = { critical: "⚠", warn: "▲", info: "●", good: "✓" };
+
+  function renderSignals(d) {
+    var el = $("signal-list");
+    if (!el) return;
+    var card = $("geo-signals");
+    var sigs = d.signals || [];
+    if (!sigs.length) {
+      el.innerHTML = "";
+      if (card) card.style.display = "none";
+      return;
+    }
+    if (card) card.style.display = "";
+    el.innerHTML = sigs.map(function (g) {
+      var lvl = g.level || "info";
+      return '<li class="signal signal-' + lvl + '">' +
+        '<span class="signal-dot" aria-hidden="true">' + (SIGNAL_ICON[lvl] || SIGNAL_ICON.info) + '</span>' +
+        '<span class="signal-text">' + escapeHtml(g.text) + '</span></li>';
+    }).join("");
+  }
+
   function statBig(main, sub) {
     return main + '<small class="stat-sub"> / ' + sub + '</small>';
   }
@@ -476,11 +497,118 @@
       btn.setAttribute("aria-expanded", open ? "true" : "false");
     });
   });
+  // --- Trends over time (Phase 2): lightweight inline-SVG line charts, no deps ---
+  function svgLineChart(series, opts) {
+    var W = 540, H = 160, pad = { l: 30, r: 10, t: 10, b: 8 };
+    var yMax = opts.yMax || 100, n = opts.n;
+    var iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+    // The latest point always sits at the right edge; with a single day, anchor
+    // it there (not mid-chart) so it reads as "trend starts here", not a stray dot.
+    function X(i) { return pad.l + (n <= 1 ? iw : (i / (n - 1)) * iw); }
+    function Y(v) { return pad.t + ih - (Math.max(0, Math.min(yMax, v)) / yMax) * ih; }
+    var grid = "";
+    [0, 0.25, 0.5, 0.75, 1].forEach(function (f) {
+      var y = pad.t + ih - f * ih;
+      grid += '<line x1="' + pad.l + '" y1="' + y + '" x2="' + (W - pad.r) + '" y2="' + y + '" class="tl-grid"/>';
+      grid += '<text x="2" y="' + (y + 3) + '" class="tl-ytick">' + Math.round(f * yMax) + '</text>';
+    });
+    var paths = series.map(function (s) {
+      if (n === 1) {
+        var y = Y(s.points[0]).toFixed(1), xr = X(0).toFixed(1);
+        // dashed "current level" guide across the plot + the dot at the right edge
+        return '<line x1="' + pad.l + '" y1="' + y + '" x2="' + xr + '" y2="' + y +
+          '" stroke="' + s.color + '" stroke-width="1.5" stroke-dasharray="3 4" opacity="0.4"/>' +
+          '<circle cx="' + xr + '" cy="' + y + '" r="3.5" fill="' + s.color + '"/>';
+      }
+      var dd = s.points.map(function (v, i) { return (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1); }).join(" ");
+      return '<path d="' + dd + '" fill="none" stroke="' + s.color + '" stroke-width="2" stroke-linejoin="round"/>';
+    }).join("");
+    // width/height attributes give the SVG an intrinsic aspect ratio so a CSS-grid
+    // row can size to its real rendered height (CSS width:100% still scales it).
+    // Without them the grid mis-sizes the row and the legend spills past the card.
+    return '<svg viewBox="0 0 ' + W + " " + H + '" width="' + W + '" height="' + H +
+      '" class="tl-svg" role="img">' + grid + paths + "</svg>";
+  }
+
+  function deltaFor(hist, points, days) {
+    var n = hist.length;
+    if (n < 2) return null;
+    var target = hist[n - 1].ts - days * 86400;
+    var idx = null;
+    for (var i = 0; i < n; i++) { if (hist[i].ts <= target) idx = i; }
+    if (idx == null) return null; // no entry old enough yet
+    return points[n - 1] - points[idx];
+  }
+
+  function trendLegend(series) {
+    function chip(dv, lbl) {
+      if (dv == null) return '<span class="tl-delta tl-na">' + lbl + ' –</span>';
+      var cls = dv > 0.05 ? "up" : (dv < -0.05 ? "down" : "flat");
+      var sign = dv > 0 ? "+" : "";
+      return '<span class="tl-delta tl-' + cls + '">' + lbl + " " + sign + dv.toFixed(1) + "</span>";
+    }
+    return '<ul class="tl-legend">' + series.map(function (s) {
+      var last = s.points[s.points.length - 1];
+      return '<li><i class="tl-swatch" style="background:' + s.color + '"></i>' +
+        '<span class="tl-name">' + escapeHtml(s.name) + "</span>" +
+        "<b>" + last.toFixed(1) + "%</b>" + chip(s.d7, "7d") + chip(s.d30, "30d") + "</li>";
+    }).join("") + "</ul>";
+  }
+
+  var TREND_PALETTE = ["#8b5cf6", "#22d3ee", "#f6c177", "#4fd1c5", "#f472b6"];
+  var HISTORY_FEEDS = { testnet: "./geo-latency-history.json", mainnet: "./geo-latency-history-mainnet.json" };
+
+  function renderTrends(net) {
+    var host1 = $("trend-continents"), host2 = $("trend-countries"), status = $("trend-status");
+    if (!host1 || !host2) return;
+    fetch(HISTORY_FEEDS[net], { cache: "no-cache" })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (hist) {
+        if (net !== currentNet) return; // tab switched mid-fetch
+        if (!Array.isArray(hist) || !hist.length) { throw new Error("empty"); }
+        var n = hist.length;
+        if (status) {
+          status.textContent = n < 2
+            ? "Collecting history — trends fill in as days accumulate (" + n + " day so far)."
+            : n + " days of history; 7d / 30d deltas appear once enough days exist.";
+        }
+        var contNames = ["EU", "NA", "APAC", "Other"];
+        var cSeries = contNames.map(function (nm) {
+          var pts = hist.map(function (day) {
+            var c = (day.continents || []).filter(function (x) { return x.name === nm; })[0];
+            return c ? c.stake_pct : 0;
+          });
+          return { name: nm, color: CONTINENT_HEX[nm] || CONTINENT_HEX.Other, points: pts,
+            d7: deltaFor(hist, pts, 7), d30: deltaFor(hist, pts, 30) };
+        });
+        host1.innerHTML = '<div class="trend-canvas">' + svgLineChart(cSeries, { yMax: 100, n: n }) + '</div>' + trendLegend(cSeries);
+
+        var top = (hist[n - 1].countries || []).slice(0, 5);
+        var kSeries = top.map(function (c, i) {
+          var pts = hist.map(function (day) {
+            var m = (day.countries || []).filter(function (x) { return x.cc === c.cc; })[0];
+            return m ? m.stake_pct : 0;
+          });
+          return { name: c.name, color: TREND_PALETTE[i % TREND_PALETTE.length], points: pts,
+            d7: deltaFor(hist, pts, 7), d30: deltaFor(hist, pts, 30) };
+        });
+        var peak = 20;
+        kSeries.forEach(function (s) { s.points.forEach(function (v) { if (v > peak) peak = v; }); });
+        var yMax = Math.ceil(peak / 10) * 10;
+        host2.innerHTML = '<div class="trend-canvas">' + svgLineChart(kSeries, { yMax: yMax, n: n }) + '</div>' + trendLegend(kSeries);
+      })
+      .catch(function () {
+        if (net !== currentNet) return;
+        if (status) status.textContent = "History feed is not available yet — it begins on the next refresh.";
+        host1.innerHTML = ""; host2.innerHTML = "";
+      });
+  }
+
   var FEEDS = { testnet: "./geo-latency-data.json", mainnet: "./geo-latency-data-mainnet.json" };
   var currentNet = null;
   function vShort() { return (VANTAGE_WORDS[currentNet] || VANTAGE_WORDS.testnet).short; }
   var VANTAGE_WORDS = {
-    testnet: { place: "Japan",  short: "JP", vantage: "Tokyo full-node" },
+    testnet: { place: "Prague", short: "CZ", vantage: "Prague server" },
     mainnet: { place: "Prague", short: "CZ", vantage: "Prague server" }
   };
   function applyVantageWording(net) {
@@ -512,9 +640,10 @@
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (d) {
         updateVantage(d);
-        renderCoverage(d); renderHeadline(d); renderDonut(d); renderLatency(d);
+        renderCoverage(d); renderHeadline(d); renderSignals(d); renderDonut(d); renderLatency(d);
         renderTopCountries(d); renderProviderMini(d); renderMap(d);
         renderContinents(d); renderCountries(d); renderProviders(d);
+        renderTrends(net);
       })
       .catch(function (e) { currentNet = null; fail("Could not load dataset (" + e.message + ")."); });
   }
@@ -533,5 +662,5 @@
     });
   });
 
-  loadNetwork("testnet");
+  loadNetwork(location.hash === "#testnet" ? "testnet" : "mainnet");
 })();
