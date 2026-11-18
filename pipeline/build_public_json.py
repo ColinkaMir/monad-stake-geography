@@ -10,6 +10,7 @@ Output:  ../outputs/proofline-public-live/geo-latency/geo-latency-data.json
 """
 import json
 import os
+import re
 import time
 from collections import defaultdict
 
@@ -25,6 +26,14 @@ RTT_MIN_MS = float(os.getenv("GEO_RTT_MIN_MS", "0"))
 # Off by default so the testnet feed's map is unchanged; the mainnet refresh
 # enables it explicitly.
 DROP_NULL_RTT_MAP = os.getenv("GEO_MAP_DROP_NULL_RTT", "0") not in ("0", "", "false", "False")
+# Optional: agreement between our off-node crawl and the Foundation's own
+# published validator dataset, produced by crosscheck_foundation.py. Included
+# verbatim when present so the page can state how checkable its own inputs are.
+CROSSCHECK = os.getenv("GEO_BUILD_CROSSCHECK", "")
+# Optional: operator names, taken from the Foundation's own public dataset. We
+# publish name + location + host and never the IP address: the identity is
+# already theirs to disclose, the address stays on their side of the line.
+NAMES_FILE = os.getenv("GEO_BUILD_NAMES", "")
 
 EU = {"DE","FI","PL","FR","NL","GB","IE","SE","NO","DK","ES","IT","PT","AT",
       "CH","BE","CZ","RO","BG","HU","SK","LT","LV","EE","GR","HR","SI","LU",
@@ -56,6 +65,52 @@ def wmedian(pairs):
 def _short(name):
     """First token of a provider/ASN name for compact signal text."""
     return str(name or "").split(",")[0].split(" (")[0].strip()
+
+
+# ── operator grouping ────────────────────────────────────────────────────────
+# One company can hold several ASNs, so bucketing by ASN understates how much
+# stake sits behind a single decision-maker. Cherry Servers holds six ASNs on
+# Monad mainnet: read by ASN the top four providers are ~51% of stake, read by
+# operator they are ~56%. The VDP scores ISP/ASN concentration, so the operator
+# view is the one that has to be right.
+#
+# The mapping is deliberately boring and auditable: strip legal-form tokens and
+# punctuation from the ASN holder name, and keep an explicit override list for
+# the cases where that is not enough. Both the grouping and the ASN members of
+# every group are published in the feed so anyone can check the joins.
+LEGAL_FORMS = {
+    "inc", "llc", "ltd", "limited", "gmbh", "bv", "sas", "sa", "ab", "oy",
+    "srl", "uab", "ltda", "pty", "jsc", "plc", "ug", "kg", "as", "corp",
+    "corporation", "company", "co", "spzoo", "ooo", "llp", "kft", "doo",
+}
+# key (after normalisation) -> canonical operator name. Only for joins that
+# name-normalisation alone cannot make, each one checked by hand.
+# NOTE: keys and values are ALREADY-NORMALISED forms (lowercase, punctuation
+# split out), because the override is applied after normalisation. Writing
+# "velia.net internetdienste" here would never match, since the dot is split.
+OPERATOR_OVERRIDES = {
+    "velia net internetdienste": "velia net",
+}
+
+
+def _norm_operator_key(as_name):
+    """Normalised join key for an ASN holder name."""
+    name = re.sub(r"^AS\d+\s+", "", str(as_name or "").strip())
+    name = name.replace("&", " and ")
+    tokens = [t for t in re.split(r"[\s,./\"'()]+", name.lower()) if t]
+    kept = [t for t in tokens if t not in LEGAL_FORMS]
+    key = " ".join(kept) or " ".join(tokens)
+    return OPERATOR_OVERRIDES.get(key, key)
+
+
+def _holder(as_name):
+    """The ASN holder name without the leading ASxxxxx."""
+    return re.sub(r"^AS\d+\s+", "", str(as_name or "?").strip()) or "?"
+
+
+def _asn_of(as_name):
+    m = re.match(r"^(AS\d+)\b", str(as_name or "").strip())
+    return m.group(1) if m else ""
 
 
 def compute_signals(continents, countries, providers, headline):
@@ -149,6 +204,10 @@ def compute_signals(continents, countries, providers, headline):
 
 
 def main():
+    names = {}
+    if NAMES_FILE and os.path.exists(NAMES_FILE):
+        names = (json.load(open(NAMES_FILE)) or {}).get("validators", {})
+
     gdata = json.load(open(GEO))
     geo = gdata["validators"]
     rtt = json.load(open(RTT))
@@ -157,6 +216,11 @@ def main():
     vs = [v for v in geo if v.get("geo") and v.get("stake_wei")]
     total_stake = sum(v["stake_wei"] for v in vs)
     total_count = len(vs)
+
+    def who(v):
+        """Operator name for a validator, from the Foundation's file if we have it."""
+        rec = names.get((v.get("node_id") or "")[2:].lower()) or {}
+        return rec.get("name"), bool(rec.get("vdp"))
 
     def valid_rtt(v):
         """Return the sanity-checked avg RTT for a validator's IP, or None if
@@ -194,6 +258,25 @@ def main():
             "rtt_ms": wmedian(cr[name]),
         })
 
+    # Operator identity per ASN holder string, built once and reused by the
+    # country breakdown, the map popups and the provider table, so all three
+    # agree on who the decision-maker is.
+    op_meta = defaultdict(lambda: {"names": defaultdict(int), "asns": set()})
+    for v in vs:
+        raw = v["geo"].get("as", "?") or "?"
+        m = op_meta[_norm_operator_key(raw)]
+        m["names"][_holder(raw)] += 1
+        if _asn_of(raw):
+            m["asns"].add(_asn_of(raw))
+    op_display = {}
+    for v in vs:
+        raw = v["geo"].get("as", "?") or "?"
+        # NB: do not call this `names`. That shadowed the operator-name map
+        # loaded at the top of main() and silently emptied every validator list
+        # on the map, with no error anywhere.
+        holder_names = op_meta[_norm_operator_key(raw)]["names"]
+        op_display[raw] = min(sorted(holder_names), key=len) if holder_names else _holder(raw)
+
     # Countries (top 12 by stake)
     ks, kc, kr = buckets(lambda v: (v["geo"].get("country", "?"),
                                     v["geo"].get("country_code", "?")))
@@ -202,8 +285,7 @@ def main():
     for v in vs:
         ckey = (v["geo"].get("country", "?"), v["geo"].get("country_code", "?"))
         asn = v["geo"].get("as", "?") or "?"
-        short = asn.split(" ", 1)[1] if asn.startswith("AS") and " " in asn else asn
-        cprov[ckey][short] += v["stake_wei"]
+        cprov[ckey][op_display.get(asn, _holder(asn))] += v["stake_wei"]
     countries = []
     for (name, cc), s in sorted(ks.items(), key=lambda kv: kv[1], reverse=True)[:12]:
         pv = sorted(cprov[(name, cc)].items(), key=lambda kv: kv[1], reverse=True)
@@ -219,22 +301,49 @@ def main():
             "provider_count": len(pv),
         })
 
-    # Providers / ASN (top 12 by stake) with cumulative
+    # Providers, ASN level. Kept in the feed for transparency: it is the raw
+    # join, and it is what every other public surface publishes.
     asns, asc, asr = buckets(lambda v: v["geo"].get("as", "?") or "?")
-    providers = []
+    providers_by_asn = []
     cum = 0.0
     for name, s in sorted(asns.items(), key=lambda kv: kv[1], reverse=True)[:12]:
         pct = round(100 * s / total_stake, 2)
         cum = round(cum + pct, 2)
-        short = name.split(" ", 1)[1] if name.startswith("AS") and " " in name else name
-        providers.append({
-            "name": short,
-            "asn": name.split(" ", 1)[0] if name.startswith("AS") else "",
+        providers_by_asn.append({
+            "name": _holder(name),
+            "asn": _asn_of(name),
             "stake_pct": pct,
             "cum_pct": cum,
             "count": asc[name],
             "rtt_ms": wmedian(asr[name]),
         })
+
+    # Providers, OPERATOR level. This is the primary view: a company holding
+    # several ASNs is one decision-maker and one correlated-failure domain, and
+    # the ASN view understates it. Every group publishes its ASN members so the
+    # join can be checked.
+    ops, opc, opr = buckets(lambda v: _norm_operator_key(v["geo"].get("as", "?") or "?"))
+    providers = []
+    cum = 0.0
+    for key, s in sorted(ops.items(), key=lambda kv: kv[1], reverse=True)[:12]:
+        pct = round(100 * s / total_stake, 2)
+        cum = round(cum + pct, 2)
+        meta = op_meta[key]
+        # display name: the shortest holder string seen for this operator, which
+        # is the one without the legal suffix when both spellings appear.
+        display = min(sorted(meta["names"]), key=len) if meta["names"] else key
+        asns_sorted = sorted(meta["asns"], key=lambda a: int(a[2:]) if a[2:].isdigit() else 0)
+        providers.append({
+            "name": display,
+            "asn": asns_sorted[0] if len(asns_sorted) == 1 else "",
+            "asns": asns_sorted,
+            "asn_count": len(asns_sorted),
+            "stake_pct": pct,
+            "cum_pct": cum,
+            "count": opc[key],
+            "rtt_ms": wmedian(opr[key]),
+        })
+    multi_asn = [p for p in providers if p["asn_count"] > 1]
 
     # Map points: aggregate by (country_code, city). Location-level only,
     # never per-validator. Each point carries count, stake share, RTT, and a
@@ -256,11 +365,14 @@ def main():
         })
         d["stake"] += v["stake_wei"]
         d["count"] += 1
+        nm, is_vdp = who(v)
+        if nm:
+            d.setdefault("ops", []).append((nm, v["stake_wei"], is_vdp))
         ms = valid_rtt(v)
         if ms is not None:
             d["rtt_pairs"].append((ms, v["stake_wei"]))
         asn = g.get("as", "?") or "?"
-        short = asn.split(" ", 1)[1] if asn.startswith("AS") and " " in asn else asn
+        short = op_display.get(asn, _holder(asn))
         d["prov"][short]["stake"] += v["stake_wei"]
         d["prov"][short]["count"] += 1
 
@@ -289,6 +401,11 @@ def main():
                  "loc_pct": round(100 * p["stake"] / d["stake"], 1)}
                 for name, p in provs[:4]
             ],
+            "validators": [
+                {"name": n, "stake_pct": round(100 * w / total_stake, 2), "vdp": vd}
+                for n, w, vd in sorted(d.get("ops", []), key=lambda x: -x[1])[:8]
+            ],
+            "validators_total": len(d.get("ops", [])),
         })
     map_points.sort(key=lambda p: p["stake_pct"], reverse=True)
 
@@ -298,11 +415,54 @@ def main():
     # them dynamically from providers[0..1], so this stays correct as the ranking rotates).
     top2 = round(sum(p["stake_pct"] for p in providers[:2]), 2)
 
+    top4_asn = round(sum(p["stake_pct"] for p in providers_by_asn[:4]), 2)
+    top2_asn = round(sum(p["stake_pct"] for p in providers_by_asn[:2]), 2)
     headline = {
+        # Primary numbers are OPERATOR level: one company is one decision-maker
+        # and one correlated-failure domain, whatever number of ASNs it holds.
         "top4_provider_stake_pct": top4,
         "top2_provider_stake_pct": top2,
+        # The raw ASN read is published beside it so the difference is visible
+        # rather than hidden: every other public surface reports the ASN number.
+        "top4_asn_stake_pct": top4_asn,
+        "top2_asn_stake_pct": top2_asn,
         "bft_threshold_pct": 33.3,
     }
+
+    # Per-validator latency bands. map_points cannot express this: a city keeps an
+    # RTT even when individual hosts inside it are ICMP-silent, so any band split
+    # derived from map_points silently inherits the city median for hosts we never
+    # measured (that mistake shipped once, 2026-08-20, as "97.9% coverage" when the
+    # per-host truth was 90.2%). Computed here from the same join the pipeline
+    # already holds, with the unmeasured share stated instead of absorbed.
+    band_edges = [(0, 25), (25, 50), (50, 100), (100, 150), (150, None)]
+    band_stake = [0] * len(band_edges)
+    unmeasured_stake = 0
+    for v in vs:
+        ms = valid_rtt(v)
+        if ms is None:
+            unmeasured_stake += v["stake_wei"]
+            continue
+        for i, (lo, hi) in enumerate(band_edges):
+            if ms >= lo and (hi is None or ms < hi):
+                band_stake[i] += v["stake_wei"]
+                break
+    latency_bands = {
+        "note": "share of ALL stake per RTT band from the vantage; hosts that "
+                "drop ICMP are reported as unmeasured, never folded into a band",
+        "bands": [
+            {"range_ms": [lo, hi], "stake_pct": round(100 * s / total_stake, 2)}
+            for (lo, hi), s in zip(band_edges, band_stake)
+        ],
+        "unmeasured_stake_pct": round(100 * unmeasured_stake / total_stake, 2),
+        "measured_stake_pct": round(100 * (total_stake - unmeasured_stake) / total_stake, 2),
+    }
+    # Addresses carrying more than one validator: shared machine, shared failure.
+    ip_counts = defaultdict(int)
+    for v in vs:
+        if v.get("ip"):
+            ip_counts[v["ip"]] += 1
+    colocated = sorted(n for n in ip_counts.values() if n > 1)
     signals = compute_signals(continents, countries, providers, headline)
 
     out = {
@@ -322,12 +482,33 @@ def main():
             "rtt_reachable_ips": rtt.get("reachable_ips"),
             "rtt_total_ips": rtt.get("total_ips"),
             "rtt_rounds": rtt.get("rounds"),
+            "rtt_measured_stake_pct": latency_bands["measured_stake_pct"],
+            "rtt_unmeasured_stake_pct": latency_bands["unmeasured_stake_pct"],
+            "distinct_addresses": len(ip_counts),
+            "addresses_with_multiple_validators": len(colocated),
         },
+        "foundation_crosscheck": (json.load(open(CROSSCHECK))
+                                  if CROSSCHECK and os.path.exists(CROSSCHECK) else None),
+        "latency_bands": latency_bands,
         "headline": headline,
         "signals": signals,
         "continents": continents,
         "countries": countries,
         "providers": providers,
+        "providers_by_asn": providers_by_asn,
+        "operator_grouping": {
+            "note": "Providers are grouped by operator, not by ASN: one company "
+                    "can hold several ASNs and is still one decision-maker. Each "
+                    "entry lists its ASN members so the join can be checked. The "
+                    "raw ASN view is published as providers_by_asn.",
+            "method": "strip legal-form tokens and punctuation from the ASN holder "
+                      "name, then apply an explicit override list",
+            "overrides": OPERATOR_OVERRIDES,
+            "multi_asn_operators": [
+                {"name": p["name"], "asns": p["asns"], "stake_pct": p["stake_pct"]}
+                for p in multi_asn
+            ],
+        },
         "map_points": map_points,
     }
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
