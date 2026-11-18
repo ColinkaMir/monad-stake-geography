@@ -32,6 +32,8 @@ Both networks share one off-node path (testnet formerly supported reading a loca
 fetch_mainnet_validators.py -> enrich_geoip.py -> measure_rtt.py -> accumulate_rtt_samples.py -> build_public_json.py
 ```
 
+On mainnet, `crosscheck_foundation.py` also compares the crawl against the Foundation's published validator dataset (IP and ASN agreement, operator names; never addresses) and the result is included in the feed. Every network call goes through `pipeline/netutil.py`, which names the client (Cloudflare in front of the Monad endpoints rejects the default Python-urllib agent) and retries 429/5xx where a stage asks for it.
+
 See `pipeline/run_pipeline_mainnet.example.sh` and `pipeline/run_pipeline_testnet.example.sh` for the production runners (copy and edit paths). RTT vantage since 2026-07-11: Prague, Europe (Tokyo before). The live map defaults to the mainnet view; `#testnet` opens the testnet view. Every stage is configured through environment variables:
 
 | Variable | Purpose |

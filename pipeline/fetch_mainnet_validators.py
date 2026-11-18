@@ -11,7 +11,8 @@ Output shape matches parse_peers.py so the rest of the geo-latency pipeline is r
 import json
 import os
 import sys
-import urllib.request
+import time
+from netutil import get_json, post_json
 from pathlib import Path
 
 DIR = "/home/admin/monad-knowledge-base/tools/geo-latency"
@@ -27,17 +28,17 @@ SONAR_FEEDS = [u.strip() for u in os.getenv(
 RPC_URL = os.getenv("MAINNET_RPC", "https://rpc.monad.xyz")
 CONTRACT = "0x0000000000000000000000000000000000001000"
 
+PACE = float(os.getenv("GEO_RPC_PACE_S", "0.06"))   # between getValidator calls; public RPC limit is 20 rps (docs)
 SEL_EPOCH = "0x757991a8"          # getEpoch() -> word0 = epoch
 SEL_CONSENSUS_SET = "0xfb29b729"  # paginated -> [is_done, next_index, offset, len, ids...]
 SEL_VALIDATOR = "0x2b6d639a"      # getValidator(id) -> auth_addr, flags, stake..., secp bytes, bls bytes
 
 
 def rpc_eth_call(data):
-    body = json.dumps({"jsonrpc": "2.0", "id": 1, "method": "eth_call",
-                       "params": [{"to": CONTRACT, "data": data}, "latest"]}).encode()
-    req = urllib.request.Request(RPC_URL, body, {"content-type": "application/json"})
-    with urllib.request.urlopen(req, timeout=20) as r:
-        d = json.load(r)
+    # The public RPCs rate-limit (429) a burst of 200 getValidator calls; retry with backoff
+    # instead of silently dropping the validator from the published set.
+    d = post_json(RPC_URL, {"jsonrpc": "2.0", "id": 1, "method": "eth_call",
+                            "params": [{"to": CONTRACT, "data": data}, "latest"]}, retries=5)
     if "error" in d:
         raise RuntimeError(f"rpc error: {d['error']}")
     return d["result"]
@@ -143,8 +144,7 @@ def main():
     ip_by_secp = {}
     for feed_url in SONAR_FEEDS:
         try:
-            with urllib.request.urlopen(feed_url, timeout=20) as r:
-                feed = json.load(r)
+            feed = get_json(feed_url)
         except Exception as e:
             print(f"  feed {feed_url} failed: {e}")
             continue
@@ -162,12 +162,27 @@ def main():
     print(f"mainnet epoch {epoch}, consensus set {len(ids)} validators; fetching getValidator...")
 
     enriched = []
+    results, failed = {}, []
     for vid in ids:
         try:
-            secp, stake = get_validator(vid)
+            results[vid] = get_validator(vid)
         except Exception as e:
+            failed.append(vid)
             print(f"  skip validator {vid}: {e}")
+        time.sleep(PACE)
+    if failed:                       # one slower second pass for whatever still failed
+        time.sleep(5)
+        for vid in failed:
+            try:
+                results[vid] = get_validator(vid)
+                print(f"  recovered validator {vid} on second pass")
+            except Exception as e:
+                print(f"  lost validator {vid}: {e}")
+            time.sleep(PACE * 4)
+    for vid in ids:
+        if vid not in results:
             continue
+        secp, stake = results[vid]
         if not secp:
             continue
         peer = ip_by_secp.get(secp)

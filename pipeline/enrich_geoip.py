@@ -5,7 +5,7 @@ Up to 100 IPs per batch request; we'll throttle ~1 batch per 4 seconds to stay s
 import json
 import os
 import time
-import urllib.request
+from netutil import post_json
 from pathlib import Path
 
 IN_FILE = os.getenv("GEO_GEOIP_IN", "/home/admin/monad-knowledge-base/tools/geo-latency/validators-with-ips.json")
@@ -19,15 +19,7 @@ def chunk(lst, n):
 
 
 def batch_query(ips):
-    payload = json.dumps(ips).encode("utf-8")
-    req = urllib.request.Request(
-        API_BATCH,
-        data=payload,
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    with urllib.request.urlopen(req, timeout=20) as resp:
-        return json.load(resp)
+    return post_json(API_BATCH, ips)
 
 
 def main():

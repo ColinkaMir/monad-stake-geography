@@ -29,7 +29,12 @@ GEO_GEOIP_IN=$MN/validators-with-ips.json GEO_GEOIP_OUT=$MN/validators-geoip.jso
 sudo env GEO_RTT_SRC=$MN/validators-geoip.json GEO_RTT_OUT=$MN/rtt-measurements.json GEO_RTT_MIN_MS="$GEO_RTT_MIN_MS" python3 measure_rtt.py >>"$LOG" 2>&1
 epoch=$(python3 -c "import json;print(json.load(open('$MN/validators-with-ips.json'))['generated_at_epoch'])")
 GEO_ACC_DIR=$MN python3 accumulate_rtt_samples.py "$epoch" >>"$LOG" 2>&1
-GEO_BUILD_GEO=$MN/validators-geoip.json GEO_BUILD_RTT=$MN/rtt-averaged.json GEO_BUILD_OUT=$OUTDATA \
+# Agreement with the Foundation's own dataset. Non-fatal: if their endpoint is
+# down we publish the map without the cross-check rather than not at all.
+GEO_XC_OURS=$MN/validators-geoip.json GEO_XC_OUT=$MN/foundation-crosscheck.json \
+  GEO_XC_NAMES=$MN/foundation-names.json python3 crosscheck_foundation.py >>"$LOG" 2>&1 || log "foundation crosscheck failed"
+GEO_BUILD_CROSSCHECK=$MN/foundation-crosscheck.json GEO_BUILD_NAMES=$MN/foundation-names.json \
+  GEO_BUILD_GEO=$MN/validators-geoip.json GEO_BUILD_RTT=$MN/rtt-averaged.json GEO_BUILD_OUT=$OUTDATA \
   GEO_MAP_DROP_NULL_RTT=1 \
   GEO_VANTAGE="Czech / Prague (Europe) - mainnet via monad-sonar" \
   GEO_VANTAGE_LAT="50.0755" GEO_VANTAGE_LON="14.4378" \
