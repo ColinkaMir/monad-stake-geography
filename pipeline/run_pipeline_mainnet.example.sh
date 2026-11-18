@@ -38,7 +38,7 @@ GEO_BUILD_CROSSCHECK=$MN/foundation-crosscheck.json GEO_BUILD_NAMES=$MN/foundati
   GEO_MAP_DROP_NULL_RTT=1 \
   GEO_VANTAGE="Czech / Prague (Europe) - mainnet via monad-sonar" \
   GEO_VANTAGE_LAT="50.0755" GEO_VANTAGE_LON="14.4378" \
-  GEO_VANTAGE_LABEL="ProofLines node · Prague" \
+  GEO_VANTAGE_LABEL="ProofLines vantage · Prague" \
   python3 build_public_json.py >>"$LOG" 2>&1
 # Append today's snapshot to the rolling history feed (time-series charts).
 GEO_HIST_SRC=$OUTDATA python3 append_history.py >>"$LOG" 2>&1 || log "history append failed"

@@ -317,7 +317,7 @@
       tr.innerHTML =
         '<td><span class="prov-share' + (mono ? ' is-mono' : '') + '">' +
           c.top_provider_pct.toFixed(0) + '%</span> ' + escapeHtml(c.top_provider) +
-          ' <small class="prov-count">' + c.provider_count + ' ASN' + (c.provider_count === 1 ? '' : 's') + '</small></td>' +
+          ' <small class="prov-count">' + c.provider_count + ' host' + (c.provider_count === 1 ? '' : 's') + '</small></td>' +
         '<td><span class="geo-flag">' + flag(c.cc) + '</span>' + c.name + '</td>' +
         '<td class="num"><span class="stake-cell"><i style="width:' +
           (c.stake_pct / maxStake * 100).toFixed(1) + '%"></i><strong>' +
@@ -396,6 +396,20 @@
         '<small>' + pr.count + ' node' + (pr.count === 1 ? '' : 's') + '</small></li>';
     }).join("");
     var rtt = p.rtt_ms == null ? "no ICMP" : p.rtt_ms + " ms";
+    // Operator names come from the Foundation's own published validator data.
+    // We show who and where; the address itself is never in this feed.
+    var vals = "";
+    if (p.validators && p.validators.length) {
+      var items = p.validators.map(function (v) {
+        return '<li><span>' + escapeHtml(v.name) +
+          (v.vdp ? ' <em class="vdp-tag">VDP</em>' : '') +
+          '</span><b>' + v.stake_pct.toFixed(2) + '%</b></li>';
+      }).join("");
+      var more = (p.validators_total || 0) - p.validators.length;
+      vals = '<div class="map-pop-prov-title">Validators here</div>' +
+        '<ul class="map-pop-prov">' + items + '</ul>' +
+        (more > 0 ? '<div class="map-pop-more">and ' + more + ' more</div>' : '');
+    }
     return '' +
       '<div class="map-pop">' +
         '<div class="map-pop-head">' + escapeHtml(p.city) + ', ' + escapeHtml(p.cc) + '</div>' +
@@ -407,6 +421,7 @@
         '</div>' +
         '<div class="map-pop-prov-title">Hosting providers</div>' +
         '<ul class="map-pop-prov">' + provs + '</ul>' +
+        vals +
       '</div>';
   }
 
@@ -468,14 +483,14 @@
       var vIcon = L.divIcon({
         className: "vantage-marker",
         html: '<span class="vantage-pulse"></span><span class="vantage-core"></span>' +
-              '<span class="vantage-label">' + escapeHtml(vp.label || "Our node") + '</span>',
+              '<span class="vantage-label">' + escapeHtml(vp.label || "Our vantage") + '</span>',
         iconSize: [16, 16],
         iconAnchor: [8, 8]
       });
       var vm = L.marker([vp.lat, vp.lon], { icon: vIcon, zIndexOffset: 1000 }).addTo(map);
       vm.bindPopup(
         '<div class="map-pop">' +
-          '<div class="map-pop-head">' + escapeHtml(vp.label || "Our node") + '</div>' +
+          '<div class="map-pop-head">' + escapeHtml(vp.label || "Our vantage") + '</div>' +
           '<div class="map-pop-sub">Measurement vantage \u2014 every RTT on this page is measured from here.</div>' +
         '</div>',
         { className: "geo-map-popup", maxWidth: 240 }
@@ -640,6 +655,12 @@
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (d) {
         updateVantage(d);
+        // The caption used to carry a hand-typed 198/198 and went stale when the
+        // active set shrank to 196. Read it from the same feed the page renders.
+        var cc = document.getElementById("mainnet-coverage-count");
+        if (cc && net === "mainnet" && d && d.coverage) {
+          cc.textContent = d.coverage.geo_located + "/" + d.coverage.total_validators;
+        }
         renderCoverage(d); renderHeadline(d); renderSignals(d); renderDonut(d); renderLatency(d);
         renderTopCountries(d); renderProviderMini(d); renderMap(d);
         renderContinents(d); renderCountries(d); renderProviders(d);

@@ -473,7 +473,7 @@ def main():
         "vantage_point": {
             "lat": float(os.getenv("GEO_VANTAGE_LAT", "35.6762")),
             "lon": float(os.getenv("GEO_VANTAGE_LON", "139.6503")),
-            "label": os.getenv("GEO_VANTAGE_LABEL", "ProofLines node \u00b7 Tokyo"),
+            "label": os.getenv("GEO_VANTAGE_LABEL", "ProofLines vantage"),
         },
         "rtt_method": "ICMP echo, 5 packets/host, averaged over all rounds this epoch, stake-weighted median",
         "coverage": {

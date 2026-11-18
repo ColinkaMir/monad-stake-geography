@@ -6,7 +6,7 @@
   "vantage_point": {
     "lat": 50.0755,
     "lon": 14.4378,
-    "label": "ProofLines node \u00b7 Prague"
+    "label": "ProofLines vantage \u00b7 Prague"
   },
   "rtt_method": "ICMP echo, 5 packets/host, averaged over all rounds this epoch, stake-weighted median",
   "coverage": {

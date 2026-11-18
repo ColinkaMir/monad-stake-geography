@@ -31,7 +31,7 @@
   <link rel="stylesheet" href="geo-latency.css?v=20260713i">
   <link rel="preload" href="./geo-latency-data-mainnet.json" as="fetch" crossorigin>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
-  <script src="geo-latency.js?v=20260725m" defer></script>
+  <script src="geo-latency.js?v=20260911a" defer></script>
 </head>
 <body>
   <div class="app-shell">
@@ -66,7 +66,7 @@
             <button class="net-tab is-active" type="button" role="tab" aria-selected="true" id="testnet-tab">Testnet</button>
             <button class="net-tab" type="button" role="tab" aria-selected="false" id="mainnet-tab">Mainnet</button>
           </div>
-          <span class="geo-preview-note" id="mainnet-preview-note" style="display:none">mainnet coverage is ~100% of the active set (198/198 at last refresh) via continuous off-node discovery, no node required; RTT is measured from our Prague vantage</span>
+          <span class="geo-preview-note" id="mainnet-preview-note" style="display:none">mainnet coverage is ~100% of the active set (<span id="mainnet-coverage-count">196/196</span> at last refresh) via continuous off-node discovery, no node required; RTT is measured from our Prague vantage</span>
         </div>
         <div class="dash-head">
           <h2 class="dash-title">At a glance
